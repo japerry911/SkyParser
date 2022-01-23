@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+type seekedFile struct {
+	lines [][]string
+}
+
 func Run() {
 	filenamePtr := flag.String("filename", "", "Name of the file being seeked")
 	seekLinesPtr := flag.Int("lines", 10, "Number of lines to seek, defaults to 10.")
@@ -20,9 +24,13 @@ func Run() {
 		log.Fatal("Invalid filename (must be available CSV file):", *filenamePtr)
 	}
 
-	lines := seekCsvFile(*filenamePtr, *seekLinesPtr)
+	sf := seekCsvFile(*filenamePtr, *seekLinesPtr)
 
-	fmt.Println(lines)
+	sf.display()
+}
+
+func (sf seekedFile) display() {
+	fmt.Println(sf.lines)
 }
 
 func validateFilename(filename string) bool {
@@ -33,7 +41,7 @@ func validateFilename(filename string) bool {
 	return true
 }
 
-func seekCsvFile(filename string, seekLines int) [][]string {
+func seekCsvFile(filename string, seekLines int) seekedFile {
 	csvLines := make([][]string, seekLines)
 
 	f, err := os.Open(filename)
@@ -52,5 +60,7 @@ func seekCsvFile(filename string, seekLines int) [][]string {
 		csvLines[i] = line
 	}
 
-	return csvLines
+	return seekedFile{
+		lines: csvLines,
+	}
 }
