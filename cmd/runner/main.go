@@ -20,7 +20,9 @@ func Run() {
 		log.Fatal("Invalid filename (must be available CSV file):", *filenamePtr)
 	}
 
-	_ = seekCsvFile(*filenamePtr, *seekLinesPtr)
+	lines := seekCsvFile(*filenamePtr, *seekLinesPtr)
+
+	fmt.Println(lines)
 }
 
 func validateFilename(filename string) bool {
@@ -31,7 +33,9 @@ func validateFilename(filename string) bool {
 	return true
 }
 
-func seekCsvFile(filename string, seekLines int) []string {
+func seekCsvFile(filename string, seekLines int) [][]string {
+	csvLines := make([][]string, seekLines)
+
 	f, err := os.Open(filename)
 	if err != nil {
 		log.Fatal("Unable to read input file:", filename)
@@ -39,12 +43,14 @@ func seekCsvFile(filename string, seekLines int) []string {
 
 	cr := csv.NewReader(f)
 
-	record, err := cr.Read()
-	if err != nil {
-		log.Fatal(err)
+	for i := 0; i < seekLines; i++ {
+		line, err := cr.Read()
+		if err != nil {
+			log.Fatalf("Failed to read line #%v.\nError Message: %v", i, err)
+		}
+
+		csvLines[i] = line
 	}
 
-	fmt.Println(record)
-
-	return record
+	return csvLines
 }
