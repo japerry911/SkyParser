@@ -2,6 +2,7 @@ package runner
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -30,7 +31,9 @@ func Run() {
 }
 
 func (sf seekedFile) display() {
-	fmt.Println(sf.lines)
+	s, _ := json.MarshalIndent(sf.lines, "", " ")
+
+	fmt.Println(string(s))
 }
 
 func validateFilename(filename string) bool {
